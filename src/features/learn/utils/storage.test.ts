@@ -37,7 +37,7 @@ beforeEach(() => {
 describe('readProgress', () => {
     it('returns empty progress when nothing is stored', () => {
         const progress = readProgress();
-        expect(progress).toEqual({ blocks: {} });
+        expect(progress).toEqual({ blocks: {}, moduleTests: {} });
     });
 
     it('reads valid stored progress', () => {
@@ -53,6 +53,7 @@ describe('readProgress', () => {
                     weakConceptTags: [],
                 },
             },
+            moduleTests: {},
         };
         localStorageMock.setItem(
             'react-learn-progress',
@@ -67,7 +68,7 @@ describe('readProgress', () => {
     it('returns empty progress on corrupted JSON', () => {
         localStorageMock.setItem('react-learn-progress', '{not valid json');
         const progress = readProgress();
-        expect(progress).toEqual({ blocks: {} });
+        expect(progress).toEqual({ blocks: {}, moduleTests: {} });
     });
 
     it('returns empty progress when stored data has wrong shape', () => {
@@ -76,7 +77,7 @@ describe('readProgress', () => {
             JSON.stringify({ wrong: 'shape' })
         );
         const progress = readProgress();
-        expect(progress).toEqual({ blocks: {} });
+        expect(progress).toEqual({ blocks: {}, moduleTests: {} });
     });
 });
 
@@ -94,6 +95,7 @@ describe('writeProgress', () => {
                     weakConceptTags: [],
                 },
             },
+            moduleTests: {},
         };
         writeProgress(progress);
 

@@ -1,8 +1,9 @@
-import { useState, useMemo } from 'react';
-import { NavLink, useParams } from 'react-router-dom';
+import { useState, useMemo, useEffect } from 'react';
+import { NavLink, useParams, useLocation } from 'react-router-dom';
 import { modules } from '../data/modules';
 import { getBlockById } from '../data/blocks';
 import { readProgress } from '../utils/storage';
+import { isModuleCompleted } from '../data/finalTests';
 
 /** Highlight matching substring in text */
 function HighlightMatch({ text, query }: { text: string; query: string }) {
@@ -27,6 +28,7 @@ export default function Sidebar() {
         moduleId?: string;
         blockId?: string;
     }>();
+    const location = useLocation();
     const progress = readProgress();
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -38,6 +40,16 @@ export default function Sidebar() {
         });
         return init;
     });
+
+    // Auto-expand the module that matches the current URL
+    useEffect(() => {
+        if (moduleId && !expanded[moduleId]) {
+            setExpanded((prev) => ({ ...prev, [moduleId]: true }));
+        }
+    }, [moduleId]);
+
+    // Check if current page is final test
+    const isFinalTestPage = location.pathname.endsWith('/final-test');
 
     // Filter blocks per module by search query
     const filteredModules = useMemo(() => {
@@ -97,13 +109,15 @@ export default function Sidebar() {
                     const passedCount = mod.blockIds.filter(
                         (bid) => progress.blocks[bid]?.passed
                     ).length;
+                    const allBlocksPassed = isModuleCompleted(mod.id, progress);
+                    const moduleTestPassed = progress.moduleTests[mod.id]?.passed;
 
                     return (
                         <div key={mod.id} className="sidebar__module">
                             <button
-                                className={`sidebar__module-btn ${mod.id === moduleId && !blockId
-                                        ? 'sidebar__module-btn--active'
-                                        : ''
+                                className={`sidebar__module-btn ${mod.id === moduleId && !blockId && !isFinalTestPage
+                                    ? 'sidebar__module-btn--active'
+                                    : ''
                                     }`}
                                 onClick={() => toggleModule(mod.id)}
                                 aria-expanded={isExpanded}
@@ -146,6 +160,26 @@ export default function Sidebar() {
                                             </li>
                                         );
                                     })}
+
+                                    {/* Final test link — only when all blocks are passed */}
+                                    {allBlocksPassed && !isSearching && (
+                                        <li>
+                                            <NavLink
+                                                to={`/modules/${mod.id}/final-test`}
+                                                className={({ isActive }) =>
+                                                    `sidebar__block-link sidebar__final-test-link ${isActive ? 'sidebar__block-link--active' : ''
+                                                    } ${moduleTestPassed ? 'sidebar__block-link--passed' : ''}`
+                                                }
+                                            >
+                                                <span className="sidebar__block-icon">
+                                                    {moduleTestPassed ? '✅' : '🏆'}
+                                                </span>
+                                                <span className="sidebar__block-text">
+                                                    Финальный тест
+                                                </span>
+                                            </NavLink>
+                                        </li>
+                                    )}
                                 </ul>
                             )}
                         </div>
