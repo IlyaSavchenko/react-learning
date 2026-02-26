@@ -89,6 +89,17 @@ export interface BlockProgress {
     weakConceptTags: string[];
 }
 
+export interface ModuleTestProgress {
+    moduleId: string;
+    attempts: number;
+    bestScorePct: number;
+    lastScorePct: number;
+    passed: boolean;
+    lastAttemptAt: string; // ISO date
+    weakConceptTags: string[];
+}
+
 export interface AppProgress {
     blocks: Record<string, BlockProgress>;
+    moduleTests: Record<string, ModuleTestProgress>;
 }

@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate, NavLink, useParams } from 'react-router-dom';
 import Sidebar from './features/learn/components/Sidebar';
 import BlockPage from './features/learn/pages/BlockPage';
+import FinalTestPage from './features/learn/pages/FinalTestPage';
 import ProgressPage from './features/learn/pages/ProgressPage';
 import AboutPage from './features/learn/pages/AboutPage';
 import { modules } from './features/learn/data/modules';
@@ -68,6 +69,7 @@ function LearnLayout() {
           <Route index element={<LearnWelcome />} />
           <Route path=":moduleId" element={<LearnWelcome />} />
           <Route path=":moduleId/blocks/:blockId" element={<BlockPage />} />
+          <Route path=":moduleId/final-test" element={<FinalTestPage />} />
         </Routes>
       </main>
     </div>

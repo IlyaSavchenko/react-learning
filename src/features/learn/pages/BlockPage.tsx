@@ -91,6 +91,12 @@ export default function BlockPage() {
 
     return (
         <div className="learn-page learn-page--block">
+            {moduleId && (
+                <div className="block-content__module-label">
+                    📚 {modules.find((m) => m.id === moduleId)?.title}
+                </div>
+            )}
+
             <article className="block-content">
                 <h1>{block.title}</h1>
 
