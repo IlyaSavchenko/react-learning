@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { NavLink, useParams, useLocation } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { modules } from '../data/modules';
 import { getBlockById } from '../data/blocks';
 import { readProgress } from '../utils/storage';
@@ -23,11 +23,24 @@ function HighlightMatch({ text, query }: { text: string; query: string }) {
     );
 }
 
+/** Extract moduleId and blockId from current URL path */
+function useRouteIds() {
+    const location = useLocation();
+    const path = location.pathname;
+
+    // matches /modules/:moduleId/blocks/:blockId
+    const blockMatch = path.match(/\/modules\/([^/]+)\/blocks\/([^/]+)/);
+    if (blockMatch) return { moduleId: blockMatch[1], blockId: blockMatch[2] };
+
+    // matches /modules/:moduleId (final-test or just module)
+    const moduleMatch = path.match(/\/modules\/([^/]+)/);
+    if (moduleMatch) return { moduleId: moduleMatch[1], blockId: undefined };
+
+    return { moduleId: undefined, blockId: undefined };
+}
+
 export default function Sidebar() {
-    const { moduleId, blockId } = useParams<{
-        moduleId?: string;
-        blockId?: string;
-    }>();
+    const { moduleId, blockId } = useRouteIds();
     const location = useLocation();
     const progress = readProgress();
     const [searchQuery, setSearchQuery] = useState('');
@@ -41,10 +54,24 @@ export default function Sidebar() {
         return init;
     });
 
-    // Auto-expand the module that matches the current URL
+    // Auto-expand the module that matches the current URL and scroll to it
     useEffect(() => {
-        if (moduleId && !expanded[moduleId]) {
-            setExpanded((prev) => ({ ...prev, [moduleId]: true }));
+        if (moduleId) {
+            setExpanded((prev) => {
+                if (prev[moduleId]) return prev;
+                return { ...prev, [moduleId]: true };
+            });
+
+            // Scroll to the active module after expand settles
+            const timer = setTimeout(() => {
+                const el = document.querySelector(
+                    `[data-module-id="${moduleId}"]`
+                );
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }, 200);
+            return () => clearTimeout(timer);
         }
     }, [moduleId]);
 
@@ -113,7 +140,7 @@ export default function Sidebar() {
                     const moduleTestPassed = progress.moduleTests[mod.id]?.passed;
 
                     return (
-                        <div key={mod.id} className="sidebar__module">
+                        <div key={mod.id} className="sidebar__module" data-module-id={mod.id}>
                             <button
                                 className={`sidebar__module-btn ${mod.id === moduleId && !blockId && !isFinalTestPage
                                     ? 'sidebar__module-btn--active'
