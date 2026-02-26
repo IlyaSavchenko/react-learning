@@ -537,6 +537,81 @@ $sidebar-width: 300px;
   }
 }
 
+/* ── Block Navigation (Prev / Next) ── */
+.block-nav {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid $color-border;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+
+  &__btn {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+    max-width: 48%;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid $color-border;
+    border-radius: $radius;
+    background: $color-surface;
+    color: $color-text;
+    cursor: pointer;
+    text-align: left;
+    transition: all $transition;
+
+    &:hover {
+      border-color: $color-primary;
+      background: $color-surface-hover;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba($color-primary, 0.15);
+    }
+
+    &--next {
+      margin-left: auto;
+    }
+  }
+
+  &__info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  &__label {
+    font-size: 0.8rem;
+    color: $color-text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.15rem;
+  }
+
+  &__title {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: $color-primary-light;
+  }
+
+  &__arrow {
+    font-size: 1.5rem;
+    color: $color-primary-light;
+    flex-shrink: 0;
+    transition: transform $transition;
+  }
+
+  &__btn--next:hover &__arrow {
+    transform: translateX(4px);
+  }
+
+  &__btn--prev:hover &__arrow {
+    transform: translateX(-4px);
+  }
+}
+
 /* ── Quiz ── */
 .quiz {
   margin-top: 3rem;
